@@ -1,10 +1,10 @@
 CXXFLAGS =	-O2 -g -Wall -fmessage-length=0
 
-OBJS =		hello_opengl.o
+OBJS =		main.o
 
 LIBS = -lGL -lglfw -lGLEW
 
-TARGET =	hello_opengl
+TARGET =	learn_opengl
 
 $(TARGET):	$(OBJS)
 	$(CXX) -o $(TARGET) $(OBJS) $(LIBS)
