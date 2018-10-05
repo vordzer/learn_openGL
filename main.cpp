@@ -54,17 +54,22 @@ int main(void) {
 	    -0.5f,  0.5f, 0.0f,  // Верхний угол
 	     0.0f, -0.5f, 0.0f,  // Нижний правый угол
 	    -1.0f, -0.5f, 0.0f,  // Нижний левый угол
+	};
+
+	GLfloat vertices_2[] = {
 	     0.5f,  0.5f, 0.0f,  // Верхний угол 2
 	     1.0f, -0.5f, 0.0f,  // Нижний правый угол 2
 	     0.0f, -0.5f, 0.0f   // Нижний левый угол 2
 	};
 	GLuint indices[] = {  // Помните, что мы начинаем с 0!
-	    0, 1, 2,   // Первый треугольник
-	    3, 4, 5    // Второй треугольник
+	    0, 1, 2
 	};
 
 	GLuint VBO;
 	glGenBuffers(1, &VBO);
+
+	GLuint VBO_2;
+	glGenBuffers(1, &VBO_2);
 
 	GLuint EBO;
 	glGenBuffers(1, &EBO);
@@ -130,6 +135,9 @@ int main(void) {
 	GLuint VAO;
 	glGenVertexArrays(1, &VAO);
 
+	GLuint VAO_2;
+	glGenVertexArrays(1, &VAO_2);
+
 	// 1. Привязываем VAO
 	glBindVertexArray(VAO);
 	// 2. Копируем наш массив вершин в буфер для OpenGL
@@ -141,6 +149,19 @@ int main(void) {
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
 	glEnableVertexAttribArray(0);
 	//4. Отвязываем VAO
+	glBindVertexArray(0);
+
+	// 1. Привязываем VAO_2
+	glBindVertexArray(VAO_2);
+	// 2. Копируем наш массив вершин в буфер для OpenGL
+	glBindBuffer(GL_ARRAY_BUFFER, VBO_2);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices_2), vertices_2, GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	// 3. Устанавливаем указатели на вершинные атрибуты
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+	glEnableVertexAttribArray(0);
+	//4. Отвязываем VAO_2
 	glBindVertexArray(0);
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -155,7 +176,10 @@ int main(void) {
 
 	    glUseProgram(shaderProgram);
 	    glBindVertexArray(VAO);
-	    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	    glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
+	    glBindVertexArray(0);
+	    glBindVertexArray(VAO_2);
+	    glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
 	    glBindVertexArray(0);
 	    glfwSwapBuffers(window); //appeared black screen
 	    glfwPollEvents();
