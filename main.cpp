@@ -88,6 +88,13 @@ int main(void) {
 	    "   color = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
 		"}\n\0";
 
+	const char *fragmentShaderSource_yellow = "#version 330 core\n"
+	    "out vec4 color;\n"
+	    "void main()\n"
+	    "{\n"
+	    "   color = vec4(1.0f, 1.0f, 0.0f, 1.0f);\n"
+		"}\n\0";
+
 	GLuint vertexShader;
 	vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
@@ -112,6 +119,17 @@ int main(void) {
 		std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
 	}
 
+	GLuint fragmentShader_yellow;
+	fragmentShader_yellow = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fragmentShader_yellow, 1, &fragmentShaderSource_yellow, NULL);
+	glCompileShader(fragmentShader_yellow);
+	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+	if(!success)
+	{
+		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+		std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+	}
+
 	GLuint shaderProgram;
 	shaderProgram = glCreateProgram();
 	glAttachShader(shaderProgram, vertexShader);
@@ -124,10 +142,21 @@ int main(void) {
 		std::cout << "ERROR::PROGRAM::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
 	}
 
-	glUseProgram(shaderProgram);
+	GLuint shaderProgram_yellow;
+	shaderProgram_yellow = glCreateProgram();
+	glAttachShader(shaderProgram_yellow, vertexShader);
+	glAttachShader(shaderProgram_yellow, fragmentShader_yellow);
+	glLinkProgram(shaderProgram_yellow);
+
+	glGetProgramiv(shaderProgram_yellow, GL_LINK_STATUS, &success);
+	if(!success) {
+		glGetProgramInfoLog(shaderProgram_yellow, 512, NULL, infoLog);
+		std::cout << "ERROR::PROGRAM::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+	}
 
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
+	glDeleteShader(fragmentShader_yellow);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
 	glEnableVertexAttribArray(0);
@@ -178,6 +207,7 @@ int main(void) {
 	    glBindVertexArray(VAO);
 	    glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
 	    glBindVertexArray(0);
+	    glUseProgram(shaderProgram_yellow);
 	    glBindVertexArray(VAO_2);
 	    glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
 	    glBindVertexArray(0);
